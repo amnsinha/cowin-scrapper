@@ -1,15 +1,29 @@
 package com.cowinscrapper.scrapper;
 
+import com.cowinscrapper.scrapper.model.Total;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVWriter;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
+import java.util.Iterator;
 
 @RestController
 public class ScrapperController {
+
+    private static final ObjectMapper objectMapper =
+            new ObjectMapper()
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     @GetMapping("/scrappers")
     String all() {
@@ -47,5 +61,17 @@ public class ScrapperController {
         }
     }
 
+    public static void main(String[] args) throws IOException, JSONException {
+        JSONObject json = new JSONObject(IOUtils.toString(new URL("https://data.covid19india.org/v4/min/data.min.json"), Charset.forName("UTF-8")));
+        Iterator<?> keys = json.keys();
+        while(keys.hasNext())
+        {
+            String key = (String)keys.next();
+            System.out.println(key);
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            Total total = objectMapper.readValue(json.getJSONObject(key).get("total").toString(), Total.class);
+            System.out.println(total);
+        }
+    }
 
 }
