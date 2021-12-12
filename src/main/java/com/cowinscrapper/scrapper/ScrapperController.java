@@ -56,8 +56,6 @@ public class ScrapperController {
             dataList.add(data);
 
         }
-
-
         // default all fields are enclosed in double quotes
         // default separator is a comma
         try (CSVWriter writer = new CSVWriter(new FileWriter("D:\\file\\test.csv"))) {
